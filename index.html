@@ -55,7 +55,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               /></svg></span
-          >Kode (JavaScript)
+          >Kode Editor
         </h2>
         <div class="editor-wrap">
           <pre id="editorHl" aria-hidden="true"></pre>
@@ -68,15 +68,27 @@
               <path d="M6 4l10 6-10 6V4z" /></svg
             >Jalankan
           </button>
+          <select class="secondary-select" id="langSelect">
+            <option value="javascript">Bahasa: JavaScript</option>
+            <option value="python">Bahasa: Python</option>
+          </select>
           <select class="secondary-select" id="sampleSelect">
             <option value="">Contoh…</option>
             <option value="var">Variabel &amp; Menampilkan</option>
             <option value="arr">Array</option>
-            <option value="if">Percabangan</option>
+            <option value="if">Percabangan (switch)</option>
+            <option value="ifsimple">Percabangan: if</option>
+            <option value="ifelseif">Percabangan: if / else if</option>
+            <option value="ifelseifelse">Percabangan: if / else if / else</option>
             <option value="loop">Perulangan</option>
             <option value="rec">Rekursi</option>
             <option value="nest">Nested Percabangan &amp; Perulangan</option>
           </select>
+          <button class="secondary" id="btnClear" type="button">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>Hapus Kode
+          </button>
         </div>
         <div id="codeview" style="margin-top: 10px; display: none"></div>
         <div class="stepinfo" id="bpinfo" style="display: none">
@@ -146,8 +158,13 @@
         <div class="warnbox" id="warnbox"></div>
       </div>
 
-      <div class="analysis-grid">
-        <div class="panel">
+      <div class="panel-tabs" id="panelTabs">
+        <button type="button" class="panel-tab active" data-target="struct">Struktogram</button>
+        <button type="button" class="panel-tab" data-target="flow">Flowchart</button>
+        <button type="button" class="panel-tab" data-target="status">Status</button>
+      </div>
+      <div class="analysis-grid" id="analysisGrid" data-active="struct">
+        <div class="panel panel-struct">
           <h2>
             <span class="tag">U1</span
             ><span class="icon-chip"
@@ -165,7 +182,7 @@
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel panel-flow">
           <h2>
             <span class="tag">U2</span
             ><span class="icon-chip"
@@ -191,7 +208,7 @@
           </div>
         </div>
 
-        <div class="panel">
+        <div class="panel panel-status">
           <h2>
             <span class="tag">U3</span
             ><span class="icon-chip"

@@ -1,4 +1,4 @@
- const SAMPLES = {
+const SAMPLES = {
         var: `// Variabel dan menampilkan nilai
 let nama = "Dewi";
 let umur = 17;
@@ -28,6 +28,32 @@ switch (true) {
     grade = "C";
 }
 console.log(grade);`,
+        ifsimple: `// Percabangan: if saja
+let nilai = 80;
+if (nilai >= 75) {
+  console.log("Lulus");
+}
+console.log("Selesai diperiksa");`,
+        ifelseif: `// Percabangan: if / else if
+let nilai = 68;
+if (nilai >= 90) {
+  console.log("A");
+} else if (nilai >= 75) {
+  console.log("B");
+} else if (nilai >= 60) {
+  console.log("C");
+}`,
+        ifelseifelse: `// Percabangan: if / else if / else
+let nilai = 55;
+if (nilai >= 90) {
+  console.log("A");
+} else if (nilai >= 75) {
+  console.log("B");
+} else if (nilai >= 60) {
+  console.log("C");
+} else {
+  console.log("Tidak lulus");
+}`,
         loop: `// Perulangan: for, while, do-while
 for (let i = 1; i <= 3; i++) {
   console.log(i);
@@ -56,6 +82,223 @@ for (let i = 1; i <= 3; i++) {
   }
 }`,
       };
+
+      const SAMPLES_PY = {
+        var: `# Variabel dan menampilkan nilai
+nama = "Dewi"
+umur = 17
+aktif = True
+print(nama)
+print(umur)
+print(aktif)`,
+        arr: `# Array (list)
+nilai = [70, 85, 60, 95]
+total = 0
+for i in range(len(nilai)):
+    total = total + nilai[i]
+rata = total / len(nilai)
+print(rata)`,
+        ifsimple: `# Percabangan: if saja
+nilai = 80
+if nilai >= 75:
+    print("Lulus")
+print("Selesai diperiksa")`,
+        ifelseif: `# Percabangan: if / elif
+nilai = 68
+if nilai >= 90:
+    print("A")
+elif nilai >= 75:
+    print("B")
+elif nilai >= 60:
+    print("C")`,
+        ifelseifelse: `# Percabangan: if / elif / else
+nilai = 55
+if nilai >= 90:
+    print("A")
+elif nilai >= 75:
+    print("B")
+elif nilai >= 60:
+    print("C")
+else:
+    print("Tidak lulus")`,
+        loop: `# Perulangan: for dan while
+for i in range(1, 4):
+    print(i)
+j = 0
+while j < 2:
+    print(j)
+    j = j + 1`,
+        rec: `# Rekursi
+def faktorial(n):
+    if n <= 1:
+        return 1
+    return n * faktorial(n - 1)
+print(faktorial(4))`,
+        nest: `# Nested percabangan di dalam perulangan
+for i in range(1, 4):
+    for j in range(1, 4):
+        if (i + j) % 2 == 0:
+            print(i, j, "genap")
+        else:
+            print(i, j, "ganjil")`,
+      };
+
+      /* ---------- Python → transpile ke sintaks yang dipahami tokenizer/parser JS ---------- */
+      function stripHashComment(line) {
+        let inQ = null,
+          out = "";
+        for (let i = 0; i < line.length; i++) {
+          const c = line[i];
+          if (inQ) {
+            out += c;
+            if (c === inQ && line[i - 1] !== "\\") inQ = null;
+            continue;
+          }
+          if (c === '"' || c === "'") {
+            inQ = c;
+            out += c;
+            continue;
+          }
+          if (c === "#") break;
+          out += c;
+        }
+        return out;
+      }
+      function pyExprToJs(s) {
+        if (!s) return s;
+        s = s.replace(/\blen\(([A-Za-z_$][\w$]*)\)/g, "$1.length");
+        s = s.replace(/\.append\(/g, ".push(");
+        s = s
+          .replace(/\bTrue\b/g, "true")
+          .replace(/\bFalse\b/g, "false")
+          .replace(/\bNone\b/g, "null");
+        s = s
+          .replace(/\band\b/g, "&&")
+          .replace(/\bor\b/g, "||")
+          .replace(/\bnot\b/g, "!");
+        return s;
+      }
+      function splitTopLevelCommas(s) {
+        const parts = [];
+        let depth = 0,
+          cur = "";
+        for (const ch of s) {
+          if (ch === "(" || ch === "[") depth++;
+          if (ch === ")" || ch === "]") depth--;
+          if (ch === "," && depth === 0) {
+            parts.push(cur.trim());
+            cur = "";
+          } else cur += ch;
+        }
+        if (cur.trim() !== "") parts.push(cur.trim());
+        return parts.filter((p) => p !== "");
+      }
+      function matchForRange(content) {
+        const m = content.match(/^for\s+([A-Za-z_$][\w$]*)\s+in\s+range\(/);
+        if (!m) return null;
+        const varName = m[1];
+        let i = m[0].length,
+          depth = 1;
+        const start = i;
+        while (i < content.length && depth > 0) {
+          if (content[i] === "(") depth++;
+          else if (content[i] === ")") {
+            depth--;
+            if (depth === 0) break;
+          }
+          i++;
+        }
+        if (depth !== 0) return null;
+        const argsRaw = content.slice(start, i);
+        const rest = content.slice(i + 1).trim();
+        if (rest !== ":") return null;
+        return { varName, argsRaw };
+      }
+      function transformPyLine(content) {
+        const fr = matchForRange(content);
+        if (fr) {
+          const args = splitTopLevelCommas(fr.argsRaw);
+          let startE = "0",
+            endE,
+            stepE = "1";
+          if (args.length === 1) endE = args[0];
+          else if (args.length === 2) {
+            startE = args[0];
+            endE = args[1];
+          } else {
+            startE = args[0];
+            endE = args[1];
+            stepE = args[2];
+          }
+          const v = fr.varName;
+          return {
+            text: `for (let ${v} = ${pyExprToJs(startE)}; ${v} < ${pyExprToJs(endE)}; ${v} += ${pyExprToJs(stepE)}) {`,
+            header: true,
+          };
+        }
+        let m;
+        if ((m = content.match(/^if\s+(.*):$/)))
+          return { text: `if (${pyExprToJs(m[1])}) {`, header: true };
+        if ((m = content.match(/^elif\s+(.*):$/)))
+          return { text: `else if (${pyExprToJs(m[1])}) {`, header: true };
+        if (/^else\s*:$/.test(content))
+          return { text: `else {`, header: true };
+        if ((m = content.match(/^while\s+(.*):$/)))
+          return { text: `while (${pyExprToJs(m[1])}) {`, header: true };
+        if (
+          (m = content.match(
+            /^def\s+([A-Za-z_$][\w$]*)\s*\(([^)]*)\)\s*:$/,
+          ))
+        )
+          return { text: `function ${m[1]}(${m[2]}) {`, header: true };
+        if (content === "pass") return { text: "", header: false };
+        if (content === "break") return { text: "break;", header: false };
+        if (content === "continue")
+          return { text: "continue;", header: false };
+        if ((m = content.match(/^return\b\s*(.*)$/)))
+          return {
+            text: `return${m[1] ? " " + pyExprToJs(m[1]) : ""};`,
+            header: false,
+          };
+        if ((m = content.match(/^print\((.*)\)$/)))
+          return {
+            text: `console.log(${pyExprToJs(m[1])});`,
+            header: false,
+          };
+        return { text: pyExprToJs(content) + ";", header: false };
+      }
+      function transpilePython(src) {
+        const lines = src.split("\n");
+        const out = [];
+        const indentStack = [0];
+        let pendingOpen = false;
+        for (const raw of lines) {
+          const noComment = stripHashComment(raw);
+          const trimmed = noComment.trim();
+          if (trimmed === "") {
+            out.push("");
+            continue;
+          }
+          const indentWidth = noComment.match(/^[ \t]*/)[0].replace(/\t/g, "    ")
+            .length;
+          let closeCount = 0;
+          if (pendingOpen) {
+            indentStack.push(indentWidth);
+            pendingOpen = false;
+          } else {
+            while (indentWidth < indentStack[indentStack.length - 1]) {
+              indentStack.pop();
+              closeCount++;
+            }
+          }
+          const { text, header } = transformPyLine(trimmed);
+          out.push("}".repeat(closeCount) + text);
+          if (header) pendingOpen = true;
+        }
+        const remaining = indentStack.length - 1;
+        if (remaining > 0) out[out.length - 1] += "}".repeat(remaining);
+        return out.join("\n");
+      }
 
       /* ---------- Lexer ---------- */
       function tokenize(src) {
@@ -1059,9 +1302,17 @@ for (let i = 1; i <= 3; i++) {
           }
         }
       }
-      function interpret(src) {
+      function interpret(src, lang) {
         nodeId = 1;
-        toks = tokenize(src);
+        let feed = src;
+        if (lang === "python") {
+          try {
+            feed = transpilePython(src);
+          } catch (e) {
+            return { fatal: "Kesalahan transpile Python: " + e.message };
+          }
+        }
+        toks = tokenize(feed);
         pos = 0;
         let ast;
         try {
@@ -1277,7 +1528,31 @@ for (let i = 1; i <= 3; i++) {
         "function",
         "return",
       ]);
+      const HL_KWS_PY = new Set([
+        "def",
+        "return",
+        "if",
+        "elif",
+        "else",
+        "for",
+        "in",
+        "range",
+        "while",
+        "print",
+        "True",
+        "False",
+        "None",
+        "and",
+        "or",
+        "not",
+        "break",
+        "continue",
+        "pass",
+        "len",
+      ]);
       function highlightCode(src) {
+        const isPy = currentLang === "python";
+        const kwSet = isPy ? HL_KWS_PY : HL_KWS;
         let out = "";
         let i = 0;
         const n = src.length;
@@ -1293,7 +1568,14 @@ for (let i = 1; i <= 3; i++) {
             i++;
             continue;
           }
-          if (c === "/" && src[i + 1] === "/") {
+          if (isPy && c === "#") {
+            let j = i;
+            while (j < n && src[j] !== "\n") j++;
+            out += `<span class="tok-cm">${esc(src.slice(i, j))}</span>`;
+            i = j;
+            continue;
+          }
+          if (!isPy && c === "/" && src[i + 1] === "/") {
             let j = i;
             while (j < n && src[j] !== "\n") j++;
             out += `<span class="tok-cm">${esc(src.slice(i, j))}</span>`;
@@ -1320,7 +1602,7 @@ for (let i = 1; i <= 3; i++) {
             let j = i;
             while (j < n && /[A-Za-z0-9_$]/.test(src[j])) j++;
             const w = src.slice(i, j);
-            out += HL_KWS.has(w)
+            out += kwSet.has(w)
               ? `<span class="tok-kw">${esc(w)}</span>`
               : `<span class="tok-id">${esc(w)}</span>`;
             i = j;
@@ -1364,6 +1646,41 @@ for (let i = 1; i <= 3; i++) {
         playTimer = null,
         srcLines = [];
       let breakpoints = new Set();
+      let currentLang = "javascript";
+
+      const SAMPLE_LABELS = {
+        var: "Variabel &amp; Menampilkan",
+        arr: "Array",
+        if: "Percabangan (switch)",
+        ifsimple: "Percabangan: if",
+        ifelseif: "Percabangan: if / else if",
+        ifelseifelse: "Percabangan: if / else if / else",
+        loop: "Perulangan",
+        rec: "Rekursi",
+        nest: "Nested Percabangan &amp; Perulangan",
+      };
+      function populateSampleSelect(lang) {
+        const src = lang === "python" ? SAMPLES_PY : SAMPLES;
+        const sel = document.getElementById("sampleSelect");
+        sel.innerHTML =
+          '<option value="">Contoh…</option>' +
+          Object.keys(src)
+            .map(
+              (k) =>
+                `<option value="${k}">${SAMPLE_LABELS[k] || k}</option>`,
+            )
+            .join("");
+      }
+      populateSampleSelect(currentLang);
+      document.getElementById("langSelect").onchange = function () {
+        currentLang = this.value;
+        populateSampleSelect(currentLang);
+        const src = currentLang === "python" ? SAMPLES_PY : SAMPLES;
+        editor.value = src.var || Object.values(src)[0] || "";
+        updateHighlight();
+        errbox.style.display = "none";
+        warnbox.style.display = "none";
+      };
 
       function updateHighlight() {
         editorHl.innerHTML = highlightCode(editor.value);
@@ -1444,12 +1761,30 @@ for (let i = 1; i <= 3; i++) {
 
       document.getElementById("sampleSelect").onchange = function () {
         const v = this.value;
-        if (v && SAMPLES[v]) {
-          editor.value = SAMPLES[v];
+        const src = currentLang === "python" ? SAMPLES_PY : SAMPLES;
+        if (v && src[v]) {
+          editor.value = src[v];
           updateHighlight();
         }
       };
       document.getElementById("btnRun").onclick = runNow;
+      document.querySelectorAll(".panel-tab").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document
+            .querySelectorAll(".panel-tab")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          document.getElementById("analysisGrid").dataset.active =
+            btn.dataset.target;
+        });
+      });
+      document.getElementById("btnClear").onclick = () => {
+        editor.value = "";
+        updateHighlight();
+        errbox.style.display = "none";
+        warnbox.style.display = "none";
+        editor.focus();
+      };
       document.getElementById("btnEdit").onclick = () => {
         stopPlay();
         codeview.style.display = "none";
@@ -1511,7 +1846,7 @@ for (let i = 1; i <= 3; i++) {
         const src = editor.value;
         let result;
         try {
-          result = interpret(src);
+          result = interpret(src, currentLang);
         } catch (e) {
           result = { fatal: "Kesalahan tak terduga: " + e.message };
         }

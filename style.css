@@ -152,6 +152,47 @@
         grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
         gap: 16px;
       }
+      .panel-tabs {
+        display: none;
+        gap: 6px;
+      }
+      .panel-tab {
+        flex: 1;
+        background: var(--panel);
+        color: var(--muted);
+        border: 1.5px solid var(--border);
+        border-radius: 7px;
+        padding: 9px 6px;
+        font-family: inherit;
+        font-size: 0.76rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s;
+      }
+      .panel-tab.active {
+        background: var(--accent);
+        color: var(--btn-ink);
+        border-color: var(--accent);
+      }
+      @media (max-width: 720px) {
+        .panel-tabs {
+          display: flex;
+        }
+        .analysis-grid {
+          grid-template-columns: 1fr;
+        }
+        .analysis-grid .panel {
+          display: none;
+        }
+        .analysis-grid[data-active="struct"] .panel-struct,
+        .analysis-grid[data-active="flow"] .panel-flow,
+        .analysis-grid[data-active="status"] .panel-status {
+          display: block;
+        }
+      }
       .panel {
         background: var(--panel);
         border: 1px solid var(--border);
