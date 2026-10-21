@@ -7,18 +7,15 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>TRACE-IT! — Interactive Trace Code & Error Visualizer</title>
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/svgs/solid/terminal.svg"
-    />
+    <link rel="icon" type="image/svg+xml"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/svgs/solid/terminal.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+   <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
@@ -40,7 +37,9 @@
         </svg>
       </div>
       <h1>TRACE-IT!</h1>
-      <p>trace table &middot; struktogram &middot; flowchart</p>
+      <p>
+        trace table &middot; struktogram &middot; flowchart
+      </p>
     </header>
 
     <div class="wrap">
@@ -56,7 +55,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               /></svg></span
-          >Kode Editor
+          >Kode (JavaScript)
         </h2>
         <div class="editor-wrap">
           <pre id="editorHl" aria-hidden="true"></pre>
@@ -74,29 +73,23 @@
             <option value="python">Bahasa: Python</option>
           </select>
           <select class="secondary-select" id="sampleSelect">
-            <option value="">Pilih Contoh…</option>
-            <option value="var">Variabel &amp;</option>
+            <option value="">Contoh…</option>
+            <option value="var">Variabel &amp; Menampilkan</option>
             <option value="arr">Array</option>
-            <option value="ifsimple">Percabangan: if</option>
-            <option value="ifelseif">Percabangan: if / else</option>
-            <option value="ifelseifelse">
-              Percabangan: if / else if / else
-            </option>
-            <option value="if">Percabangan (switch)</option>
-            <option value="loop">Perulangan (for, while)</option>
+            <option value="br_if">Percabangan 1: if</option>
+            <option value="br_ifelse">Percabangan 2: if / else</option>
+            <option value="br_ifelseifelse">Percabangan 3: if / else if / else</option>
+            <option value="br_switch">Percabangan 4: switch-case</option>
+            <option value="lp_for">Perulangan 1: for</option>
+            <option value="lp_while">Perulangan 2: while</option>
+            <option value="lp_dowhile">Perulangan 3: do-while</option>
             <option value="rec">Rekursi</option>
             <option value="nest">Nested Percabangan &amp; Perulangan</option>
           </select>
           <button class="secondary" id="btnClear" type="button">
             <svg viewBox="0 0 20 20" fill="none">
-              <path
-                d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10"
-                stroke="currentColor"
-                stroke-width="1.6"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              /></svg
-            >Hapus Kode
+              <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>Hapus Kode
           </button>
         </div>
         <div id="codeview" style="margin-top: 10px; display: none"></div>
@@ -168,15 +161,9 @@
       </div>
 
       <div class="panel-tabs" id="panelTabs">
-        <button type="button" class="panel-tab active" data-target="struct">
-          Struktogram
-        </button>
-        <button type="button" class="panel-tab" data-target="flow">
-          Flowchart
-        </button>
-        <button type="button" class="panel-tab" data-target="status">
-          Status
-        </button>
+        <button type="button" class="panel-tab active" data-target="struct">Struktogram</button>
+        <button type="button" class="panel-tab" data-target="flow">Flowchart</button>
+        <button type="button" class="panel-tab" data-target="status">Status</button>
       </div>
       <div class="analysis-grid" id="analysisGrid" data-active="struct">
         <div class="panel panel-struct">
@@ -271,7 +258,7 @@
         </div>
       </div>
     </div>
-    <footer>&copy; 2026 <a href="https://instagram.com/fikrialfanf/">Fikri A. Fasha</a> &#8212;  SMKN 1 Maja </footer>
+    <footer>&copy; 2026 <a href="https://instagram.con/fikrialfanf/"> Fikri A. Fasha</a> - SMKN 1 Maja</footer>
     <script src="script.js"></script>
   </body>
 </html>
