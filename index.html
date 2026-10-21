@@ -6,29 +6,30 @@
 <title>TRACE-IT! — Interactive Trace Code & Error Visualizer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#eef0f7; --panel:#ffffff; --border:#e1e3ee; --text:#171922; --muted:#656b7e;
-  --accent:#4f46e5; --accent2:#ec4899; --accent-soft:#eef0ff; --ok:#16a34a; --err:#dc2626;
-  --warn-bg:#fef3c7; --warn-text:#78350f; --warn-border:#d97706; --line-active:#fff3c4;
-  --code-bg:#0d1117; --code-text:#e6e9f0; --code-muted:#5b6274; --code-line-active:#1d2436;
+  --bg:#eef1ea; --panel:#fbfcf8; --border:#d7ddce; --text:#15201a; --muted:#5e6b60;
+  --accent:#b07f0c; --accent2:#1f6b4a; --accent-soft:#e8ecdf; --ok:#1f6b4a; --err:#b3261e;
+  --warn-bg:#fdf3d8; --warn-text:#5c4813; --warn-border:#b07f0c; --line-active:#f6e4a8;
+  --code-bg:#0e1512; --code-text:#dde7dd; --code-muted:#57634f; --code-line-active:#24311f;
+  --btn-ink:#1c1406;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#0c0d13; --panel:#161822; --border:#2a2d3c; --text:#eef0f7; --muted:#8d93a8;
-    --accent:#818cf8; --accent2:#f472b6; --accent-soft:#242745; --ok:#4ade80; --err:#f87171;
-    --warn-bg:#3a2f12; --warn-text:#fbbf24; --warn-border:#b45309; --line-active:#352c12;
-    --code-bg:#07080d; --code-text:#e6e9f0; --code-muted:#5b6274; --code-line-active:#1a2033;
+    --bg:#0b0f0c; --panel:#121a14; --border:#283428; --text:#e7ede2; --muted:#93a08d;
+    --accent:#d7a73e; --accent2:#4fae82; --accent-soft:#1c2a1d; --ok:#4fae82; --err:#f08a7e;
+    --warn-bg:#2d240f; --warn-text:#e8c874; --warn-border:#8a6a1e; --line-active:#3a2f12;
+    --code-bg:#0a0f0a; --code-text:#dde7dd; --code-muted:#57634f; --code-line-active:#1c2a1d;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#0c0d13; --panel:#161822; --border:#2a2d3c; --text:#eef0f7; --muted:#8d93a8;
-  --accent:#818cf8; --accent2:#f472b6; --accent-soft:#242745; --ok:#4ade80; --err:#f87171;
-  --warn-bg:#3a2f12; --warn-text:#fbbf24; --warn-border:#b45309; --line-active:#352c12;
-  --code-bg:#07080d; --code-text:#e6e9f0; --code-muted:#5b6274; --code-line-active:#1a2033;
+  --bg:#0b0f0c; --panel:#121a14; --border:#283428; --text:#e7ede2; --muted:#93a08d;
+  --accent:#d7a73e; --accent2:#4fae82; --accent-soft:#1c2a1d; --ok:#4fae82; --err:#f08a7e;
+  --warn-bg:#2d240f; --warn-text:#e8c874; --warn-border:#8a6a1e; --line-active:#3a2f12;
+  --code-bg:#0a0f0a; --code-text:#dde7dd; --code-muted:#57634f; --code-line-active:#1c2a1d;
   color-scheme: dark;
 }
 *{box-sizing:border-box;}
@@ -36,124 +37,109 @@ html{scroll-padding-top:env(safe-area-inset-top,0px);}
 body{margin:0; color:var(--text); font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
   background:
-    radial-gradient(1100px 520px at 10% -15%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%),
-    radial-gradient(900px 460px at 110% 5%, color-mix(in srgb, var(--accent2) 16%, transparent), transparent 60%),
-    radial-gradient(circle, color-mix(in srgb, var(--text) 5%, transparent) 1px, transparent 1px) 0 0/22px 22px,
+    radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent) 1px, transparent 1px) 0 0/24px 24px,
     var(--bg);
   background-attachment:fixed;}
-header{padding:34px 20px 10px; text-align:center;}
-.logo-mark{width:48px; height:48px; border-radius:14px; display:inline-flex; align-items:center; justify-content:center;
-  background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff; margin-bottom:12px;
-  box-shadow:0 10px 24px -10px color-mix(in srgb, var(--accent) 75%, transparent);}
-.logo-mark svg{width:26px; height:26px;}
-header h1{margin:0; font-size:2rem; font-weight:800; letter-spacing:-.03em;
-  background:linear-gradient(120deg, var(--accent), #a78bfa 55%, var(--accent2));
-  -webkit-background-clip:text; background-clip:text; color:transparent;}
-header p{margin:6px 0 0; color:var(--muted); font-size:.88rem;}
-.chiprow{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px;}
-.badge{display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:999px; font-size:.68rem; font-weight:700;
-  letter-spacing:.03em; background:var(--accent-soft); color:var(--accent); border:1px solid color-mix(in srgb, var(--accent) 25%, transparent);}
-.badge svg{width:11px; height:11px;}
-.wrap{max-width:1180px; margin:0 auto; padding:14px 16px 28px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
-.panel.wide{grid-column:1 / -1;}
-@media (max-width:980px){ .wrap{grid-template-columns:1fr 1fr;} }
-@media (max-width:640px){ .wrap{grid-template-columns:1fr;} }
-.panel{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:16px;
-  box-shadow:0 1px 2px rgba(0,0,0,.04), 0 12px 28px -16px rgba(20,20,40,.25);
-  transition:box-shadow .25s, transform .25s;}
-.panel:hover{box-shadow:0 2px 6px rgba(0,0,0,.05), 0 18px 34px -16px rgba(20,20,40,.3);}
-.panel h2{margin:0 0 12px; font-size:.78rem; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.07em;
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); background:var(--bg); z-index:10;}
+header{padding:30px 20px 16px; text-align:center; border-bottom:1px solid var(--border); margin-bottom:6px;}
+.logo-mark{width:44px; height:44px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent); color:var(--btn-ink); margin-bottom:10px;}
+.logo-mark svg{width:24px; height:24px;}
+header h1{margin:0; font-size:1.9rem; font-weight:700; letter-spacing:-.01em; font-family:'JetBrains Mono',ui-monospace,monospace; color:var(--text);}
+header p{margin:7px 0 0; color:var(--muted); font-size:.82rem; font-family:'JetBrains Mono',ui-monospace,monospace;}
+.wrap{max-width:1180px; margin:0 auto; padding:16px 16px 30px; display:flex; flex-direction:column; gap:16px;}
+.analysis-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:16px;}
+.panel{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.panel h2{margin:0 0 12px; font-size:.78rem; color:var(--muted); font-weight:600; letter-spacing:.01em;
   display:flex; align-items:center; gap:8px;}
-.icon-chip{width:24px; height:24px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
-  background:linear-gradient(135deg, var(--accent), var(--accent2)); color:#fff;}
-.icon-chip svg{width:13px; height:13px;}
-textarea{width:100%; min-height:190px; background:var(--code-bg); color:var(--code-text); border:none; border-radius:12px;
+.tag{font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.66rem; font-weight:700; color:var(--accent);
+  border:1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius:4px; padding:1px 5px; flex-shrink:0;}
+.icon-chip{width:22px; height:22px; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;
+  background:var(--accent-soft); color:var(--accent);}
+.icon-chip svg{width:12px; height:12px;}
+textarea{width:100%; min-height:190px; background:var(--code-bg); color:var(--code-text); border:none; border-radius:10px;
   font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:.85rem; line-height:1.6; padding:14px; resize:vertical;
-  tab-size:2; outline:none; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 22%, transparent);}
-#codeview{background:var(--code-bg); color:var(--code-text); border-radius:12px; padding:10px 0; font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; font-size:.8rem; overflow-x:auto; max-height:220px; overflow-y:auto;
-  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent);}
+  tab-size:2; outline:none; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 20%, transparent);}
+#codeview{background:var(--code-bg); color:var(--code-text); border-radius:10px; padding:10px 0; font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; font-size:.8rem; overflow-x:auto; max-height:220px; overflow-y:auto;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);}
 .codeline{display:flex; gap:10px; padding:2px 12px; white-space:pre; border-left:3px solid transparent; transition:background .2s;}
 .codeline .ln{color:var(--code-muted); width:1.4em; text-align:right; flex-shrink:0; user-select:none;}
-.codeline.active{background:var(--code-line-active); border-left-color:var(--accent); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);}
-@keyframes glow{0%,100%{box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);} 50%{box-shadow:0 0 0 5px color-mix(in srgb, var(--accent) 15%, transparent);}}
+.codeline.active{background:var(--code-line-active); border-left-color:var(--accent);}
+@keyframes traceFlash{0%{box-shadow:0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);} 100%{box-shadow:0 0 0 6px transparent;}}
 .controls{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
-button{display:inline-flex; align-items:center; gap:7px; background:linear-gradient(135deg, var(--accent), var(--accent2));
-  color:#fff; border:none; border-radius:999px; padding:9px 16px; font-family:inherit; font-size:.82rem; font-weight:700; cursor:pointer;
-  box-shadow:0 4px 12px -4px color-mix(in srgb, var(--accent) 65%, transparent); transition:transform .15s, box-shadow .15s;}
+button{display:inline-flex; align-items:center; gap:7px; background:var(--accent); color:var(--btn-ink); border:none; border-radius:7px;
+  padding:9px 16px; font-family:inherit; font-size:.82rem; font-weight:700; cursor:pointer; transition:filter .15s;}
 button svg{width:14px; height:14px; flex-shrink:0;}
-button:hover:not(:disabled){transform:translateY(-1px); box-shadow:0 6px 16px -4px color-mix(in srgb, var(--accent) 65%, transparent);}
-button:active:not(:disabled){transform:translateY(0);}
-button.secondary{background:var(--panel); color:var(--accent); box-shadow:none; border:1.5px solid color-mix(in srgb, var(--accent) 35%, var(--border));}
-button:disabled{opacity:.35; cursor:default; box-shadow:none; transform:none;}
+button:hover:not(:disabled){filter:brightness(1.08);}
+button:active:not(:disabled){filter:brightness(.96);}
+button.secondary{background:transparent; color:var(--text); border:1.5px solid var(--border);}
+button.secondary:hover:not(:disabled){border-color:var(--accent); color:var(--accent);}
+button:disabled{opacity:.35; cursor:default;}
 .progress{height:5px; background:var(--border); border-radius:4px; margin-top:10px; overflow:hidden;}
-.progress-bar{height:100%; background:linear-gradient(90deg, var(--accent), #ec4899); width:0%; transition:width .3s;}
-.stepinfo{color:var(--muted); font-size:.75rem; margin-top:6px;}
-.errbox{margin-top:8px; padding:8px 10px; background:color-mix(in srgb, var(--err) 15%, transparent); color:var(--err); border-radius:8px; font-size:.8rem; display:none;}
-.warnbox{margin-top:8px; padding:8px 10px; background:var(--accent-soft); color:var(--accent); border-radius:8px; font-size:.78rem; display:none;}
+.progress-bar{height:100%; background:var(--accent); width:0%; transition:width .3s;}
+.stepinfo{color:var(--muted); font-size:.75rem; margin-top:6px; font-family:'JetBrains Mono',ui-monospace,monospace;}
+.errbox{margin-top:8px; padding:8px 10px; background:color-mix(in srgb, var(--err) 14%, transparent); color:var(--err); border-radius:8px; font-size:.8rem; display:none;}
+.warnbox{margin-top:8px; padding:8px 10px; background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); border-radius:8px; font-size:.78rem; display:none;}
 
 #structogram{font-size:.78rem; max-height:420px; overflow:auto;}
-.struct-box{background:var(--accent-soft); border:1px solid var(--border); border-radius:8px; padding:6px 9px; margin:4px 0; box-shadow:0 1px 2px rgba(0,0,0,.04);}
-.struct-if{border:1px solid var(--border); border-radius:10px; margin:4px 0; overflow:hidden; box-shadow:0 1px 2px rgba(0,0,0,.04);}
-.struct-if-head{background:var(--code-bg); color:var(--code-text); padding:6px 9px; font-weight:600;}
-.struct-if-branches{display:flex;}
-.struct-branch{flex:1; padding:6px; border-top:1px solid var(--border);}
-.struct-branch:first-child{border-right:1px solid var(--border);}
-.branch-label{font-size:.68rem; color:var(--muted); text-transform:uppercase; margin-bottom:3px;}
+.struct-box{background:var(--accent-soft); border:1px solid var(--border); border-radius:7px; padding:6px 9px; margin:4px 0;}
+.struct-if{border:1px solid var(--border); border-radius:9px; margin:4px 0; overflow:hidden;}
+.struct-if-head{background:var(--code-bg); color:var(--code-text); padding:6px 9px; font-weight:600; font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.76rem;}
+.struct-if-branches{display:flex; flex-wrap:wrap;}
+.struct-branch{flex:1; min-width:110px; padding:6px; border-top:1px solid var(--border);}
+.struct-branch:not(:last-child){border-right:1px solid var(--border);}
+.branch-label{font-size:.66rem; color:var(--muted); margin-bottom:3px; font-family:'JetBrains Mono',ui-monospace,monospace;}
 .struct-empty{color:var(--muted); font-style:italic; font-size:.75rem;}
-.struct-loop{border:2px solid var(--accent); border-radius:10px; padding:6px; margin:4px 0; background:color-mix(in srgb, var(--accent) 4%, transparent);}
-.struct-loop-head{font-weight:700; padding:3px 4px 6px; color:var(--accent);}
+.struct-loop{border:2px solid var(--accent2); border-radius:9px; padding:6px; margin:4px 0; background:color-mix(in srgb, var(--accent2) 5%, transparent);}
+.struct-loop-head{font-weight:700; padding:3px 4px 6px; color:var(--accent2); font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.76rem;}
 .struct-loop-body{margin-left:10px; border-left:2px dashed var(--border); padding-left:8px;}
-.struct-func{border:2px solid var(--accent2); border-radius:10px; padding:6px; margin:4px 0 10px; background:color-mix(in srgb, var(--accent2) 6%, transparent);}
-.struct-func-head{font-weight:700; padding:3px 4px 6px; color:var(--accent2); font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.76rem;}
+.struct-func{border:2px solid var(--accent); border-radius:9px; padding:6px; margin:4px 0 10px; background:color-mix(in srgb, var(--accent) 6%, transparent);}
+.struct-func-head{font-weight:700; padding:3px 4px 6px; color:var(--accent); font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.76rem;}
 .struct-func-body{margin-left:10px; border-left:2px dashed var(--border); padding-left:8px;}
-[data-id].active{outline:2px solid var(--accent); background:var(--line-active) !important; color:var(--text) !important; animation:glow 1.1s ease-in-out infinite;}
+.struct-break{border-left:3px solid var(--err) !important;}
+.struct-continue{border-left:3px solid var(--accent2) !important;}
+[data-id].active{outline:2px solid var(--accent); background:var(--line-active) !important; color:var(--btn-ink) !important; animation:traceFlash .5s ease-out;}
 
 .flow{font-size:.75rem; font-family:'JetBrains Mono',ui-monospace,monospace;}
-.flow-pill{width:fit-content; margin:4px auto; padding:6px 20px; border-radius:999px; background:var(--code-bg); color:var(--code-text); text-align:center; font-weight:600; box-shadow:0 2px 6px rgba(0,0,0,.1);}
+.flow-pill{width:fit-content; margin:4px auto; padding:6px 20px; border-radius:999px; background:var(--code-bg); color:var(--code-text); text-align:center; font-weight:600;}
 .flow-arrow{text-align:center; color:var(--muted); line-height:1; margin:1px 0;}
-.flow-box{background:var(--accent-soft); border:1px solid var(--border); border-radius:8px; padding:6px 11px; margin:3px auto; width:fit-content; max-width:95%; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.flow-box{background:var(--accent-soft); border:1px solid var(--border); border-radius:7px; padding:6px 11px; margin:3px auto; width:fit-content; max-width:95%; text-align:center;}
 .flow-diamond{background:var(--warn-bg); color:var(--warn-text); border:1px solid var(--warn-border); font-weight:600;
-  clip-path:polygon(8% 0%,92% 0%,100% 50%,92% 100%,8% 100%,0% 50%); padding:7px 22px; margin:3px auto; width:fit-content; max-width:95%; text-align:center;
-  box-shadow:0 1px 3px rgba(0,0,0,.08);}
-.flow-branches{display:flex; gap:10px; margin:2px 0;}
-.flow-col{flex:1; border-top:1px dashed var(--border); padding-top:4px;}
+  clip-path:polygon(8% 0%,92% 0%,100% 50%,92% 100%,8% 100%,0% 50%); padding:7px 22px; margin:3px auto; width:fit-content; max-width:95%; text-align:center;}
+.flow-branches{display:flex; gap:10px; margin:2px 0; flex-wrap:wrap;}
+.flow-col{flex:1; min-width:120px; border-top:1px dashed var(--border); padding-top:4px;}
 .flow-label{font-size:.65rem; color:var(--muted); text-align:center; margin-bottom:2px;}
 .flow-empty{color:var(--muted); font-style:italic; text-align:center; font-size:.7rem;}
 .flow-merge{text-align:center; color:var(--muted); font-size:.68rem; margin:2px 0;}
-.flow-loopbody{border:2px dashed var(--accent); border-radius:8px; padding:4px 8px; margin:2px 0;}
-.flow-loopback{text-align:center; color:var(--accent); font-size:.68rem; margin-top:2px;}
+.flow-loopbody{border:2px dashed var(--accent2); border-radius:8px; padding:4px 8px; margin:2px 0;}
+.flow-loopback{text-align:center; color:var(--accent2); font-size:.68rem; margin-top:2px;}
 
 .varrow{display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
-.varbox{flex:1; min-width:70px; text-align:center; background:var(--accent-soft); border-radius:12px; padding:10px 6px;
-  transition:transform .25s, background .25s, box-shadow .25s; box-shadow:0 1px 2px rgba(0,0,0,.04);}
-.varbox .label{font-size:.68rem; color:var(--muted); text-transform:uppercase;}
-.varbox .value{font-size:1.4rem; font-weight:800; font-family:ui-monospace,Menlo,Consolas,monospace; margin-top:2px;}
-.varbox.pulse{transform:scale(1.1); background:var(--line-active); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);}
-table{width:100%; border-collapse:collapse; font-size:.78rem; font-family:'JetBrains Mono',ui-monospace,monospace;}
-th,td{text-align:left; padding:6px 7px; border-bottom:1px solid var(--border);}
-th{color:var(--muted); font-weight:600; font-size:.66rem; text-transform:uppercase; letter-spacing:.04em;}
+.varbox{flex:1; min-width:70px; text-align:center; background:var(--accent-soft); border-radius:10px; padding:10px 6px;
+  transition:transform .25s, background .25s, box-shadow .25s;}
+.varbox .label{font-size:.66rem; color:var(--muted); font-family:'JetBrains Mono',ui-monospace,monospace;}
+.varbox .value{font-size:1.15rem; font-weight:800; font-family:ui-monospace,Menlo,Consolas,monospace; margin-top:2px; word-break:break-word;}
+.varbox.pulse{transform:scale(1.08); background:var(--line-active); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);}
+table{width:100%; border-collapse:collapse; font-size:.77rem; font-family:'JetBrains Mono',ui-monospace,monospace;}
+th,td{text-align:left; padding:6px 7px; border-bottom:1px solid var(--border); word-break:break-word;}
+th{color:var(--muted); font-weight:600; font-size:.65rem;}
 tbody tr:hover{background:var(--accent-soft);}
-#narration{margin-top:8px; padding:9px 11px; background:var(--accent-soft); border-radius:10px; font-size:.8rem; min-height:2.2em; border-left:3px solid var(--accent);}
-#output{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; font-size:.8rem; margin-top:8px; background:var(--code-bg); color:var(--ok); padding:9px 11px; border-radius:10px; min-height:2em; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ok) 20%, transparent); white-space:pre-wrap;}
-footer{text-align:center; padding:18px 16px 28px; color:var(--muted); font-size:.75rem;}
+#narration{margin-top:8px; padding:9px 11px; background:var(--accent-soft); border-radius:9px; font-size:.8rem; min-height:2.2em; border-left:3px solid var(--accent);}
+#output{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; font-size:.8rem; margin-top:8px; background:var(--code-bg); color:var(--ok); padding:9px 11px; border-radius:9px; min-height:2em; box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ok) 18%, transparent); white-space:pre-wrap;}
+footer{text-align:center; padding:18px 16px 28px; color:var(--muted); font-size:.74rem; font-family:'JetBrains Mono',ui-monospace,monospace;}
 </style>
 </head>
 <body>
 <header>
   <div class="logo-mark"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5l5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 15h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
   <h1>TRACE-IT!</h1>
-  <p>Interactive Trace &amp; Code &amp; Error Visualizer</p>
-  <div class="chiprow">
-    <span class="badge"><svg viewBox="0 0 20 20" fill="none"><path d="M8 6L3 10l5 4M13 6l5 4-5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Live Code</span>
-    <span class="badge"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="11" y="3" width="6" height="6" rx="1.2"/><rect x="3" y="11" width="6" height="6" rx="1.2"/><rect x="11" y="11" width="6" height="6" rx="1.2"/></svg>Struktogram</span>
-    <span class="badge"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="3.5" r="2" fill="currentColor"/><circle cx="4" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><path d="M10 5.5v3M10 8.5L4 14M10 8.5l6 5.5" stroke="currentColor" stroke-width="1.5"/></svg>Flowchart</span>
-    <span class="badge"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="11" width="3" height="6"/><rect x="8.5" y="6" width="3" height="11"/><rect x="14" y="2" width="3" height="15"/></svg>Trace Table</span>
-  </div>
+  <p>trace table &middot; struktogram &middot; flowchart</p>
 </header>
 
 <div class="wrap">
-  <div class="panel wide">
-    <h2><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M8 6L3 10l5 4M13 6l5 4-5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kode (JavaScript sederhana)</h2>
+  <div class="panel">
+    <h2><span class="tag">SRC</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M8 6L3 10l5 4M13 6l5 4-5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Kode (JavaScript)</h2>
     <textarea id="editor" spellcheck="false"></textarea>
     <div class="errbox" id="errbox"></div>
     <div class="controls">
@@ -173,46 +159,57 @@ footer{text-align:center; padding:18px 16px 28px; color:var(--muted); font-size:
     <div class="warnbox" id="warnbox"></div>
   </div>
 
-  <div class="panel">
-    <h2><span class="icon-chip"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="11" y="3" width="6" height="6" rx="1.2"/><rect x="3" y="11" width="6" height="6" rx="1.2"/><rect x="11" y="11" width="6" height="6" rx="1.2"/></svg></span>Struktogram (Nassi–Shneiderman)</h2>
-    <div id="structogram"><span class="struct-empty">Jalankan kode untuk melihat struktogram.</span></div>
-  </div>
+  <div class="analysis-grid">
+    <div class="panel">
+      <h2><span class="tag">U1</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.2"/><rect x="11" y="3" width="6" height="6" rx="1.2"/><rect x="3" y="11" width="6" height="6" rx="1.2"/><rect x="11" y="11" width="6" height="6" rx="1.2"/></svg></span>Struktogram</h2>
+      <div id="structogram"><span class="struct-empty">Jalankan kode untuk melihat struktogram.</span></div>
+    </div>
 
-  <div class="panel">
-    <h2><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="3.5" r="2" fill="currentColor"/><circle cx="4" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><path d="M10 5.5v3M10 8.5L4 14M10 8.5l6 5.5" stroke="currentColor" stroke-width="1.5"/></svg></span>Flowchart</h2>
-    <div id="flowchart" class="flow" style="max-height:420px; overflow:auto;"><span class="struct-empty">Jalankan kode untuk melihat flowchart.</span></div>
-  </div>
+    <div class="panel">
+      <h2><span class="tag">U2</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="3.5" r="2" fill="currentColor"/><circle cx="4" cy="16" r="2" fill="currentColor"/><circle cx="16" cy="16" r="2" fill="currentColor"/><path d="M10 5.5v3M10 8.5L4 14M10 8.5l6 5.5" stroke="currentColor" stroke-width="1.5"/></svg></span>Flowchart</h2>
+      <div id="flowchart" class="flow" style="max-height:420px; overflow:auto;"><span class="struct-empty">Jalankan kode untuk melihat flowchart.</span></div>
+    </div>
 
-  <div class="panel">
-    <h2><span class="icon-chip"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="11" width="3" height="6"/><rect x="8.5" y="6" width="3" height="11"/><rect x="14" y="2" width="3" height="15"/></svg></span>Status Eksekusi</h2>
-    <div class="varrow" id="varrow"></div>
-    <table><thead><tr id="traceHead"></tr></thead><tbody id="traceBody"></tbody></table>
-    <h2 style="margin-top:14px;"><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14v9H8l-4 4V13H3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>Output</h2>
-    <div id="output">(belum ada output)</div>
-    <h2 style="margin-top:14px;"><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h10M3 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Narasi</h2>
-    <div id="narration">Tulis atau muat contoh kode, lalu klik "Jalankan".</div>
+    <div class="panel">
+      <h2><span class="tag">U3</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="11" width="3" height="6"/><rect x="8.5" y="6" width="3" height="11"/><rect x="14" y="2" width="3" height="15"/></svg></span>Status Eksekusi</h2>
+      <div class="varrow" id="varrow"></div>
+      <table><thead><tr id="traceHead"></tr></thead><tbody id="traceBody"></tbody></table>
+      <h2 style="margin-top:14px;"><span class="tag">OUT</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M3 4h14v9H8l-4 4V13H3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>Output</h2>
+      <div id="output">(belum ada output)</div>
+      <h2 style="margin-top:14px;"><span class="tag">LOG</span><span class="icon-chip"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h10M3 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>Narasi</h2>
+      <div id="narration">Tulis atau muat contoh kode, lalu klik "Jalankan".</div>
+    </div>
   </div>
 </div>
 
 <footer>&copy; 2026 Fikri A. Fasha</footer>
 
 <script>
-const SAMPLE = `let total = 0;
-for (let i = 1; i < 5; i++) {
-  if (i % 2 === 0) {
-    total = total + i;
-  } else {
-    total = total - 1;
-  }
+const SAMPLE = `let nilai = [70, 85, 60, 95];
+let total = 0;
+for (let i = 0; i < nilai.length; i++) {
+  total = total + nilai[i];
 }
-console.log(total);`;
+let rata = total / nilai.length;
+let grade = "";
+switch (true) {
+  case rata >= 90:
+    grade = "A";
+    break;
+  case rata >= 75:
+    grade = "B";
+    break;
+  default:
+    grade = "C";
+}
+console.log(grade);`;
 
 /* ---------- Lexer ---------- */
 function tokenize(src){
   const tokens=[]; let i=0,line=1; const n=src.length;
   const isDigit=c=>c>='0'&&c<='9', isAlpha=c=>/[A-Za-z_$]/.test(c), isAlnum=c=>/[A-Za-z0-9_$]/.test(c);
   const threeOps=['===','!=='], twoOps=['==','!=','<=','>=','&&','||','+=','-=','*=','/=','++','--'];
-  const oneOps='+-*/%<>=!', puncts='(),;{}.';
+  const oneOps='+-*/%<>=!', puncts='(),;{}.[]:';
   while(i<n){
     const c=src[i];
     if(c==='\n'){line++;i++;continue;}
@@ -221,7 +218,7 @@ function tokenize(src){
     if(isDigit(c)){let j=i;while(j<n&&(isDigit(src[j])||src[j]==='.'))j++;tokens.push({type:'num',value:parseFloat(src.slice(i,j)),line});i=j;continue;}
     if(c==='"'||c==="'"){const q=c;let j=i+1,s='';while(j<n&&src[j]!==q){s+=src[j];j++;}tokens.push({type:'str',value:s,line});i=j+1;continue;}
     if(isAlpha(c)){let j=i;while(j<n&&isAlnum(src[j]))j++;const w=src.slice(i,j);
-      const kws=['let','const','var','if','else','for','while','console','true','false','function','return'];
+      const kws=['let','const','var','if','else','for','while','do','switch','case','default','break','continue','console','true','false','function','return'];
       tokens.push({type:kws.includes(w)?'kw':'ident',value:w,line});i=j;continue;}
     const three=src.slice(i,i+3);
     if(threeOps.includes(three)){tokens.push({type:'op',value:three,line});i+=3;continue;}
@@ -253,12 +250,17 @@ function parseStatement(){
   if(isKw('if')) return parseIf();
   if(isKw('for')) return parseFor();
   if(isKw('while')) return parseWhile();
+  if(isKw('do')) return parseDoWhile();
+  if(isKw('switch')) return parseSwitch();
+  if(isKw('break')){const line=next().line; expectPunct(';'); return {type:'break',line,id:nodeId++};}
+  if(isKw('continue')){const line=next().line; expectPunct(';'); return {type:'continue',line,id:nodeId++};}
   if(isKw('console')) return parseLog();
   if(isKw('function')) return parseFuncDecl();
   if(isKw('return')) return parseReturn();
   if(t.type==='ident'){
     const nxt=toks[pos+1];
     if(nxt && nxt.type==='punct' && nxt.value==='(') return parseCallStmt();
+    if(nxt && nxt.type==='punct' && nxt.value==='.') return parseMethodStmt();
     return parseUpdateOrAssignStmt();
   }
   throw new Error(`Pernyataan tidak dikenali di baris ${t.line}`);
@@ -288,19 +290,31 @@ function parseCallStmt(){
   expectPunct(')'); expectPunct(';');
   return {type:'callstmt',name,args,line,id:nodeId++};
 }
+function parseMethodStmt(){
+  const line=peek().line; const objName=next().value;
+  expectPunct('.'); const name=next().value;
+  expectPunct('(');
+  const args=[];
+  if(!isPunct(')')){ args.push(parseExpr()); while(isPunct(',')){next(); args.push(parseExpr());} }
+  expectPunct(')'); expectPunct(';');
+  return {type:'methodstmt',objName,name,args,line,id:nodeId++};
+}
 function parseDeclStmt(){
   const line=peek().line; next(); const name=next().value; expectOp('='); const expr=parseExpr(); expectPunct(';');
   return {type:'decl',name,expr,line,id:nodeId++};
 }
 function parseUpdateNoSemi(){
   const line=peek().line; const name=next().value;
-  if(isOp('++')||isOp('--')){ const op=next().value; return {type:'update',name,op,line,id:nodeId++}; }
+  let target={type:'var',name,line};
+  while(isPunct('[')){ next(); const idx=parseExpr(); expectPunct(']'); target={type:'index',obj:target,index:idx,line}; }
+  if(target.type==='var' && (isOp('++')||isOp('--'))){ const op=next().value; return {type:'update',name,op,line,id:nodeId++}; }
   let op='=';
   if(isOp('=')) next();
   else if(peek().type==='op'&&['+=','-=','*=','/='].includes(peek().value)) op=next().value;
   else throw new Error(`Pernyataan tidak valid di baris ${line}`);
   const expr=parseExpr();
-  return {type:'assign',name,op,expr,line,id:nodeId++};
+  if(target.type==='var') return {type:'assign',name:target.name,op,expr,line,id:nodeId++};
+  return {type:'indexassign',target,op,expr,line,id:nodeId++};
 }
 function parseUpdateOrAssignStmt(){
   if(peek().type!=='ident') throw new Error(`Pernyataan tidak dikenali di baris ${peek().line}`);
@@ -336,6 +350,33 @@ function parseWhile(){
   const body=parseBlock();
   return {type:'while',cond,body,line,id:nodeId++};
 }
+function parseDoWhile(){
+  const line=peek().line; next();
+  const body=parseBlock();
+  if(!isKw('while')) throw new Error(`Diharapkan "while" setelah blok do (baris ${peek().line})`);
+  next(); expectPunct('('); const cond=parseExpr(); expectPunct(')'); expectPunct(';');
+  return {type:'dowhile',cond,body,line,id:nodeId++};
+}
+function parseSwitch(){
+  const line=peek().line; next(); expectPunct('(');
+  const disc=parseExpr(); expectPunct(')'); expectPunct('{');
+  const cases=[];
+  while(!isPunct('}')){
+    if(isKw('case')){
+      next(); const test=parseExpr(); expectPunct(':');
+      const body=[];
+      while(!isKw('case')&&!isKw('default')&&!isPunct('}')) body.push(parseStatement());
+      cases.push({test,body});
+    } else if(isKw('default')){
+      next(); expectPunct(':');
+      const body=[];
+      while(!isKw('case')&&!isKw('default')&&!isPunct('}')) body.push(parseStatement());
+      cases.push({test:null,body});
+    } else throw new Error(`Diharapkan "case" atau "default" di baris ${peek().line}`);
+  }
+  expectPunct('}');
+  return {type:'switch',disc,cases,line,id:nodeId++};
+}
 function parseLog(){
   const line=peek().line; next(); expectPunct('.'); const m=next().value;
   if(m!=='log') throw new Error(`Hanya console.log yang didukung (baris ${line})`);
@@ -354,10 +395,33 @@ function parseAdd(){let l=parseMul(); while(peek().type==='op'&&['+','-'].includ
 function parseMul(){let l=parseUnary(); while(peek().type==='op'&&['*','/','%'].includes(peek().value)){const op=next().value; l={type:'bin',op,l,r:parseUnary()};} return l;}
 function parseUnary(){ if(isOp('!')||isOp('-')){const op=next().value; return {type:'un',op,e:parseUnary()};} return parsePrimary(); }
 function parsePrimary(){
+  let node=parseAtomBase();
+  while(true){
+    if(isPunct('[')){ const line=peek().line; next(); const idx=parseExpr(); expectPunct(']'); node={type:'index',obj:node,index:idx,line}; continue; }
+    if(isPunct('.')){
+      next(); const mt=next(); const mname=mt.value;
+      if(isPunct('(')){
+        next(); const args=[];
+        if(!isPunct(')')){ args.push(parseExpr()); while(isPunct(',')){next(); args.push(parseExpr());} }
+        expectPunct(')');
+        node={type:'methodcall',obj:node,name:mname,args,line:mt.line,id:nodeId++}; continue;
+      }
+      node={type:'member',obj:node,name:mname,line:mt.line}; continue;
+    }
+    break;
+  }
+  return node;
+}
+function parseAtomBase(){
   const t=peek();
   if(t.type==='num'){next(); return {type:'lit',value:t.value};}
   if(t.type==='str'){next(); return {type:'lit',value:t.value};}
   if(t.type==='kw'&&(t.value==='true'||t.value==='false')){next(); return {type:'lit',value:t.value==='true'};}
+  if(isPunct('[')){
+    next(); const elems=[];
+    if(!isPunct(']')){ elems.push(parseExpr()); while(isPunct(',')){next(); elems.push(parseExpr());} }
+    expectPunct(']'); return {type:'arrlit',elems};
+  }
   if(t.type==='ident'){
     next();
     if(isPunct('(')){
@@ -377,6 +441,34 @@ function evalExpr(n,env){
   switch(n.type){
     case 'lit': return n.value;
     case 'var': if(!(n.name in env)) throw new Error(`Variabel "${n.name}" belum dideklarasikan`); return env[n.name];
+    case 'arrlit': return n.elems.map(e=>evalExpr(e,env));
+    case 'index':{
+      const o=evalExpr(n.obj,env); const i=evalExpr(n.index,env);
+      if(!Array.isArray(o)) throw new Error(`Bukan array, tidak bisa diindeks (baris ${n.line})`);
+      if(i<0||i>=o.length) throw new Error(`Indeks ${i} di luar jangkauan array (baris ${n.line})`);
+      return o[i];
+    }
+    case 'member':{
+      const o=evalExpr(n.obj,env);
+      if(n.name==='length'){ if(Array.isArray(o)||typeof o==='string') return o.length; throw new Error(`"length" hanya untuk array/string (baris ${n.line})`); }
+      throw new Error(`Properti "${n.name}" tidak dikenal (baris ${n.line})`);
+    }
+    case 'methodcall':{
+      const o=evalExpr(n.obj,env); const argVals=n.args.map(a=>evalExpr(a,env));
+      if(Array.isArray(o)){
+        switch(n.name){
+          case 'push': o.push(...argVals); return o.length;
+          case 'pop': return o.pop();
+          case 'shift': return o.shift();
+          case 'unshift': o.unshift(...argVals); return o.length;
+          case 'join': return o.join(argVals[0]!==undefined?argVals[0]:',');
+          case 'includes': return o.includes(argVals[0]);
+          case 'indexOf': return o.indexOf(argVals[0]);
+          case 'slice': return o.slice(...argVals);
+        }
+      }
+      throw new Error(`Metode "${n.name}" tidak didukung (baris ${n.line})`);
+    }
     case 'un': return n.op==='!' ? !evalExpr(n.e,env) : -evalExpr(n.e,env);
     case 'bin':{
       if(n.op==='&&') return evalExpr(n.l,env)&&evalExpr(n.r,env);
@@ -390,6 +482,8 @@ function evalExpr(n,env){
   }
 }
 class ReturnSignal{ constructor(value){ this.value=value; } }
+class BreakSignal{}
+class ContinueSignal{}
 let functions={};
 function callFunction(name,argVals,line,id){
   const fn=functions[name];
@@ -406,14 +500,20 @@ function callFunction(name,argVals,line,id){
   pushStep(id,line,`Kembali dari ${name}()${retVal!==undefined?' dengan nilai '+fmt(retVal):''}`);
   return retVal;
 }
-function fmt(v){ return typeof v==='string' ? v : JSON.stringify(v); }
+function fmt(v){ if(Array.isArray(v)) return '['+v.map(fmt).join(', ')+']'; return typeof v==='string' ? v : JSON.stringify(v); }
 let env,steps,stepCount; const MAX_STEPS=400;
-function snap(){ const o={}; for(const k in env) o[k]=env[k]; return o; }
+function snap(){ const o={}; for(const k in env) o[k]=Array.isArray(env[k])?env[k].slice():env[k]; return o; }
 function pushStep(id,line,note,output){
   steps.push({id,line,vars:snap(),output: output!==undefined?output:null,note});
   stepCount++; if(stepCount>MAX_STEPS) throw new Error('__MAXSTEPS__');
 }
 function execStmts(list){ for(const s of list) execStmt(s); }
+function resolveIndexTarget(target,env){
+  const arr=evalExpr(target.obj,env);
+  if(!Array.isArray(arr)) throw new Error(`Target bukan array (baris ${target.line})`);
+  const idx=evalExpr(target.index,env);
+  return {arr,idx};
+}
 function execStmt(n){
   switch(n.type){
     case 'decl':{ const v=evalExpr(n.expr,env); env[n.name]=v; pushStep(n.id,n.line,`Deklarasi: ${n.name} = ${fmt(v)}`); break; }
@@ -423,25 +523,70 @@ function execStmt(n){
       const nv = n.op==='='?v : n.op==='+='?cur+v : n.op==='-='?cur-v : n.op==='*='?cur*v : cur/v;
       env[n.name]=nv; pushStep(n.id,n.line,`${n.name} diperbarui menjadi ${fmt(nv)}`); break;
     }
+    case 'indexassign':{
+      const {arr,idx}=resolveIndexTarget(n.target,env);
+      const v=evalExpr(n.expr,env); const cur=arr[idx];
+      const nv = n.op==='='?v : n.op==='+='?cur+v : n.op==='-='?cur-v : n.op==='*='?cur*v : cur/v;
+      arr[idx]=nv; pushStep(n.id,n.line,`${exprStr(n.target)} diperbarui menjadi ${fmt(nv)}`); break;
+    }
     case 'update':{ env[n.name]= n.op==='++'?env[n.name]+1:env[n.name]-1; pushStep(n.id,n.line,`${n.name}${n.op} → menjadi ${fmt(env[n.name])}`); break; }
     case 'log':{ const vals=n.args.map(a=>evalExpr(a,env)); const out=vals.map(fmt).join(' '); pushStep(n.id,n.line,`console.log → mencetak: ${out}`,out); break; }
     case 'funcdecl': break;
     case 'callstmt':{ const argVals=n.args.map(a=>evalExpr(a,env)); callFunction(n.name,argVals,n.line,n.id); break; }
+    case 'methodstmt':{
+      const arr=env[n.objName];
+      if(arr===undefined) throw new Error(`Variabel "${n.objName}" belum dideklarasikan (baris ${n.line})`);
+      if(!Array.isArray(arr)) throw new Error(`"${n.objName}" bukan array (baris ${n.line})`);
+      const argVals=n.args.map(a=>evalExpr(a,env));
+      switch(n.name){
+        case 'push': arr.push(...argVals); break;
+        case 'pop': arr.pop(); break;
+        case 'shift': arr.shift(); break;
+        case 'unshift': arr.unshift(...argVals); break;
+        default: throw new Error(`Metode "${n.name}" tidak didukung (baris ${n.line})`);
+      }
+      pushStep(n.id,n.line,`${n.objName}.${n.name}(${argVals.map(fmt).join(', ')}) → ${n.objName} menjadi ${fmt(arr)}`); break;
+    }
     case 'return':{ const v=n.expr?evalExpr(n.expr,env):undefined; pushStep(n.id,n.line,`return${n.expr?' '+fmt(v):''}`); throw new ReturnSignal(v); }
+    case 'break':{ pushStep(n.id,n.line,'break'); throw new BreakSignal(); }
+    case 'continue':{ pushStep(n.id,n.line,'continue'); throw new ContinueSignal(); }
     case 'if':{ const c=evalExpr(n.cond,env); pushStep(n.id,n.line,`Kondisi diperiksa: ${c?'True → blok "ya"':'False → blok "tidak"'}`); if(c) execStmts(n.then); else if(n.els) execStmts(n.els); break; }
+    case 'switch':{
+      const v=evalExpr(n.disc,env);
+      pushStep(n.id,n.line,`Evaluasi switch: nilai = ${fmt(v)}`);
+      let startIdx=-1;
+      for(let i=0;i<n.cases.length;i++){ const c=n.cases[i]; if(c.test!==null && evalExpr(c.test,env)===v){ startIdx=i; break; } }
+      if(startIdx===-1) startIdx=n.cases.findIndex(c=>c.test===null);
+      if(startIdx!==-1){
+        try{ for(let i=startIdx;i<n.cases.length;i++) execStmts(n.cases[i].body); }
+        catch(e){ if(e instanceof BreakSignal){} else throw e; }
+      }
+      break;
+    }
     case 'for':{
       if(n.init) execStmt(n.init);
       while(true){
         const c=evalExpr(n.cond,env); pushStep(n.id,n.line,`Cek kondisi loop: ${c?'True, lanjutkan':'False, loop berakhir'}`);
         if(!c) break;
-        execStmts(n.body); if(n.update) execStmt(n.update);
+        try{ execStmts(n.body); }
+        catch(e){ if(e instanceof BreakSignal){ break; } else if(e instanceof ContinueSignal){} else throw e; }
+        if(n.update) execStmt(n.update);
       } break;
     }
     case 'while':{
       while(true){
         const c=evalExpr(n.cond,env); pushStep(n.id,n.line,`Cek kondisi loop: ${c?'True, lanjutkan':'False, loop berakhir'}`);
         if(!c) break;
-        execStmts(n.body);
+        try{ execStmts(n.body); }
+        catch(e){ if(e instanceof BreakSignal){ break; } else if(e instanceof ContinueSignal){} else throw e; }
+      } break;
+    }
+    case 'dowhile':{
+      while(true){
+        try{ execStmts(n.body); }
+        catch(e){ if(e instanceof BreakSignal){ break; } else if(e instanceof ContinueSignal){} else throw e; }
+        const c=evalExpr(n.cond,env); pushStep(n.id,n.line,`Cek kondisi do-while: ${c?'True, ulangi':'False, loop berakhir'}`);
+        if(!c) break;
       } break;
     }
   }
@@ -456,6 +601,7 @@ function interpret(src){
   try{ execStmts(ast); }
   catch(e){
     if(e instanceof ReturnSignal){ /* return di level atas: hentikan dengan tenang */ }
+    else if(e instanceof BreakSignal || e instanceof ContinueSignal){ if(steps.length===0) return {fatal:'break/continue digunakan di luar loop atau switch.'}; warn='Program berhenti: break/continue digunakan di luar loop/switch.'; }
     else if(e.message==='__MAXSTEPS__') warn='Berhenti otomatis: lebih dari 400 langkah (kemungkinan loop tak berhenti).';
     else { if(steps.length===0) return {fatal:'Kesalahan saat eksekusi: '+e.message}; warn='Program berhenti karena error: '+e.message; }
   }
@@ -464,12 +610,35 @@ function interpret(src){
 
 /* ---------- Structogram ---------- */
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
-function exprStr(n){ if(!n) return ''; switch(n.type){ case 'lit': return typeof n.value==='string'?`"${n.value}"`:String(n.value); case 'var': return n.name; case 'un': return `${n.op}${exprStr(n.e)}`; case 'bin': return `${exprStr(n.l)} ${n.op} ${exprStr(n.r)}`; case 'call': return `${n.name}(${n.args.map(exprStr).join(', ')})`; } return ''; }
-function stmtHeadStr(n){ if(n.type==='decl') return `${n.name} = ${exprStr(n.expr)}`; if(n.type==='assign') return `${n.name} ${n.op} ${exprStr(n.expr)}`; if(n.type==='update') return `${n.name}${n.op}`; return ''; }
+function exprStr(n){
+  if(!n) return '';
+  switch(n.type){
+    case 'lit': return typeof n.value==='string'?`"${n.value}"`:String(n.value);
+    case 'var': return n.name;
+    case 'un': return `${n.op}${exprStr(n.e)}`;
+    case 'bin': return `${exprStr(n.l)} ${n.op} ${exprStr(n.r)}`;
+    case 'call': return `${n.name}(${n.args.map(exprStr).join(', ')})`;
+    case 'arrlit': return `[${n.elems.map(exprStr).join(', ')}]`;
+    case 'index': return `${exprStr(n.obj)}[${exprStr(n.index)}]`;
+    case 'member': return `${exprStr(n.obj)}.${n.name}`;
+    case 'methodcall': return `${exprStr(n.obj)}.${n.name}(${n.args.map(exprStr).join(', ')})`;
+  }
+  return '';
+}
+function stmtHeadStr(n){
+  if(n.type==='decl') return `${n.name} = ${exprStr(n.expr)}`;
+  if(n.type==='assign') return `${n.name} ${n.op} ${exprStr(n.expr)}`;
+  if(n.type==='update') return `${n.name}${n.op}`;
+  if(n.type==='indexassign') return `${exprStr(n.target)} ${n.op} ${exprStr(n.expr)}`;
+  if(n.type==='methodstmt') return `${n.objName}.${n.name}(${n.args.map(exprStr).join(', ')})`;
+  return '';
+}
 function buildStructogram(list){ return list.map(renderNode).join(''); }
 function renderNode(n){
-  if(n.type==='decl'||n.type==='assign'||n.type==='update') return `<div class="struct-box" data-id="${n.id}">${esc(stmtHeadStr(n))}</div>`;
+  if(n.type==='decl'||n.type==='assign'||n.type==='update'||n.type==='indexassign'||n.type==='methodstmt') return `<div class="struct-box" data-id="${n.id}">${esc(stmtHeadStr(n))}</div>`;
   if(n.type==='log') return `<div class="struct-box" data-id="${n.id}">cetak ${esc(n.args.map(exprStr).join(', '))}</div>`;
+  if(n.type==='break') return `<div class="struct-box struct-break" data-id="${n.id}">break</div>`;
+  if(n.type==='continue') return `<div class="struct-box struct-continue" data-id="${n.id}">continue</div>`;
   if(n.type==='if'){
     return `<div class="struct-if"><div class="struct-if-head" data-id="${n.id}">jika (${esc(exprStr(n.cond))})</div>
       <div class="struct-if-branches">
@@ -477,9 +646,16 @@ function renderNode(n){
         <div class="struct-branch"><div class="branch-label">tidak</div>${n.els?buildStructogram(n.els):'<div class="struct-empty">–</div>'}</div>
       </div></div>`;
   }
+  if(n.type==='switch'){
+    const cols=n.cases.map(c=>`<div class="struct-branch"><div class="branch-label">${c.test===null?'default':esc(exprStr(c.test))}</div>${buildStructogram(c.body)}</div>`).join('');
+    return `<div class="struct-if"><div class="struct-if-head" data-id="${n.id}">switch (${esc(exprStr(n.disc))})</div><div class="struct-if-branches">${cols}</div></div>`;
+  }
   if(n.type==='for'||n.type==='while'){
     const head = n.type==='for' ? `untuk (${n.init?esc(stmtHeadStr(n.init)):''}; ${esc(exprStr(n.cond))}; ${n.update?esc(stmtHeadStr(n.update)):''})` : `selama (${esc(exprStr(n.cond))})`;
     return `<div class="struct-loop"><div class="struct-loop-head" data-id="${n.id}">${head}</div><div class="struct-loop-body">${buildStructogram(n.body)}</div></div>`;
+  }
+  if(n.type==='dowhile'){
+    return `<div class="struct-loop"><div class="struct-loop-body">${buildStructogram(n.body)}</div><div class="struct-loop-head" data-id="${n.id}">lakukan … selama (${esc(exprStr(n.cond))})</div></div>`;
   }
   if(n.type==='funcdecl') return `<div class="struct-func"><div class="struct-func-head">function ${esc(n.name)}(${n.params.join(', ')})</div><div class="struct-func-body">${buildStructogram(n.body)}</div></div>`;
   if(n.type==='callstmt') return `<div class="struct-box" data-id="${n.id}">panggil ${esc(n.name)}(${n.args.map(exprStr).join(', ')})</div>`;
@@ -497,10 +673,12 @@ function buildFlowchart(list){
 function buildFlowSeq(list){ return list.map(renderFlowNode).join(''); }
 function renderFlowNode(n){
   if(n.type==='funcdecl') return '';
-  if(n.type==='decl'||n.type==='assign'||n.type==='update') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}">${esc(stmtHeadStr(n))}</div>`;
+  if(n.type==='decl'||n.type==='assign'||n.type==='update'||n.type==='indexassign'||n.type==='methodstmt') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}">${esc(stmtHeadStr(n))}</div>`;
   if(n.type==='log') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}">cetak ${esc(n.args.map(exprStr).join(', '))}</div>`;
   if(n.type==='callstmt') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}">panggil ${esc(n.name)}(${n.args.map(exprStr).join(', ')})</div>`;
   if(n.type==='return') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}">kembalikan ${n.expr?esc(exprStr(n.expr)):''}</div>`;
+  if(n.type==='break') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}" style="border-left:3px solid var(--err);">break</div>`;
+  if(n.type==='continue') return `<div class="flow-arrow">↓</div><div class="flow-box" data-id="${n.id}" style="border-left:3px solid var(--accent2);">continue</div>`;
   if(n.type==='if'){
     return `<div class="flow-arrow">↓</div><div class="flow-diamond" data-id="${n.id}">jika (${esc(exprStr(n.cond))})</div>
       <div class="flow-branches">
@@ -508,11 +686,20 @@ function renderFlowNode(n){
         <div class="flow-col"><div class="flow-label">tidak ↓</div>${n.els?buildFlowSeq(n.els):'<div class="flow-empty">–</div>'}</div>
       </div><div class="flow-merge">↓ (gabung)</div>`;
   }
+  if(n.type==='switch'){
+    const cols=n.cases.map(c=>`<div class="flow-col"><div class="flow-label">${c.test===null?'default':esc(exprStr(c.test))} ↓</div>${buildFlowSeq(c.body)}</div>`).join('');
+    return `<div class="flow-arrow">↓</div><div class="flow-diamond" data-id="${n.id}">switch (${esc(exprStr(n.disc))})</div><div class="flow-branches">${cols}</div><div class="flow-merge">↓ (gabung)</div>`;
+  }
   if(n.type==='for'||n.type==='while'){
-    const label = n.type==='for' ? `cek: ${esc(exprStr(n.cond))}` : `cek: ${esc(exprStr(n.cond))}`;
+    const label = `cek: ${esc(exprStr(n.cond))}`;
     return `<div class="flow-arrow">↓</div><div class="flow-diamond" data-id="${n.id}">${label}</div>
       <div class="flow-loopbody">${buildFlowSeq(n.body)}<div class="flow-loopback">⟲ kembali ke pengecekan kondisi</div></div>
       <div class="flow-merge">↓ (loop selesai)</div>`;
+  }
+  if(n.type==='dowhile'){
+    return `<div class="flow-arrow">↓</div><div class="flow-loopbody">${buildFlowSeq(n.body)}</div>
+      <div class="flow-arrow">↓</div><div class="flow-diamond" data-id="${n.id}">cek: ${esc(exprStr(n.cond))}</div>
+      <div class="flow-loopback">⟲ jika true, ulangi dari atas</div><div class="flow-merge">↓ (selesai jika false)</div>`;
   }
   return '';
 }
@@ -529,7 +716,6 @@ let curSteps=[], curVarNames=[], current=-1, playTimer=null, srcLines=[];
 
 editor.value = SAMPLE;
 
-/* Auto-closing brackets/quotes + smart indent on Enter */
 editor.addEventListener('keydown', function(e){
   const pairs = {'(':')', '[':']', '{':'}', '"':'"', "'":"'"};
   const closers = Object.values(pairs);
