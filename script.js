@@ -34,15 +34,14 @@ if (nilai >= 75) {
   console.log("Lulus");
 }
 console.log("Selesai diperiksa");`,
-        ifelseif: `// Percabangan: if / else if
-let nilai = 68;
-if (nilai >= 90) {
-  console.log("A");
-} else if (nilai >= 75) {
-  console.log("B");
-} else if (nilai >= 60) {
-  console.log("C");
-}`,
+        ifelse: `// Percabangan: if / else
+let nilai = 80;
+let kkm = 75;
+if (nilai >= kkm) {
+  console.log("Lulus");
+} else{
+  console.log("Tidak lulus");
+} `,
         ifelseifelse: `// Percabangan: if / else if / else
 let nilai = 55;
 if (nilai >= 90) {
@@ -103,14 +102,13 @@ nilai = 80
 if nilai >= 75:
     print("Lulus")
 print("Selesai diperiksa")`,
-        ifelseif: `# Percabangan: if / elif
+        ifelse: `# Percabangan: if / else
 nilai = 68
+kkm = 75
 if nilai >= 90:
-    print("A")
-elif nilai >= 75:
-    print("B")
-elif nilai >= 60:
-    print("C")`,
+    print("Lulus")
+else:
+    print("Tidak lulus")`,
         ifelseifelse: `# Percabangan: if / elif / else
 nilai = 55
 if nilai >= 90:
@@ -1653,7 +1651,7 @@ for i in range(1, 4):
         arr: "Array",
         if: "Percabangan (switch)",
         ifsimple: "Percabangan: if",
-        ifelseif: "Percabangan: if / else if",
+        ifelse: "Percabangan: if / else",
         ifelseifelse: "Percabangan: if / else if / else",
         loop: "Perulangan",
         rec: "Rekursi",
