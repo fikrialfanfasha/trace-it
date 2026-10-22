@@ -1631,6 +1631,7 @@ for i in range(1, 4):
         editorHl = document.getElementById("editorHl"),
         errbox = document.getElementById("errbox"),
         warnbox = document.getElementById("warnbox");
+      const fullscreenBtn = document.getElementById("btnFullscreen");
       const codeview = document.getElementById("codeview"),
         structogram = document.getElementById("structogram");
       const varrow = document.getElementById("varrow"),
@@ -1678,6 +1679,39 @@ for i in range(1, 4):
             .join("");
       }
       populateSampleSelect(currentLang);
+      function updateFullscreenButton() {
+        const isFullscreen = Boolean(document.fullscreenElement);
+        const label = isFullscreen ? "Keluar layar penuh" : "Layar penuh";
+        fullscreenBtn.setAttribute("aria-pressed", String(isFullscreen));
+        fullscreenBtn.setAttribute(
+          "aria-label",
+          isFullscreen ? "Keluar dari layar penuh" : "Masuk layar penuh",
+        );
+        fullscreenBtn.title = isFullscreen
+          ? "Keluar dari layar penuh"
+          : "Masuk layar penuh";
+        fullscreenBtn.querySelector("span").textContent = label;
+      }
+      fullscreenBtn.onclick = async () => {
+        errbox.style.display = "none";
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+          } else if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          } else {
+            errbox.textContent =
+              "Browser ini tidak mendukung mode layar penuh.";
+            errbox.style.display = "block";
+          }
+        } catch (error) {
+          errbox.textContent =
+            "Mode layar penuh tidak dapat diaktifkan: " + error.message;
+          errbox.style.display = "block";
+        }
+      };
+      document.addEventListener("fullscreenchange", updateFullscreenButton);
+      updateFullscreenButton();
       document.getElementById("langSelect").onchange = function () {
         currentLang = this.value;
         populateSampleSelect(currentLang);
